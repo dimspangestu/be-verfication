@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+python-dotenv
+sqlalchemy
+pydantic
+xhtml2pdf
+reportlab
+pyodbc
