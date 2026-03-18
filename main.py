@@ -36,6 +36,7 @@ app.add_middleware(
         "http://localhost:3123",
         "http://localhost:3000",
         "http://localhost:5173",
+        "https://fondofund.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
