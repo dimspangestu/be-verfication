@@ -18,7 +18,6 @@ from admin_routes import router as admin_router
 from investor_funding_routes import router as investor_router
 from payment_webhook_routes import router as payment_router
 from models_admin_funding import ProjectFunding, PaymentTransaction, LedgerEntry
-from investor_funding_routes import router as investor_router
 from vendor_signature_routes import router as vendor_signature_router
 from models_admin_funding import SignatureRequest
 from signed_document_routes import router as signed_document_router
@@ -26,8 +25,7 @@ from models_documents import DocumentTemplate, GeneratedDocument, SignedDocument
 from document_routes import router as document_router
 app = FastAPI(
     title="Fondofund Auth API",
-    version="1.0",
-    dependencies=[Depends(verify_api_key)],
+    version="1.0"
 )
 
 app.add_middleware(
