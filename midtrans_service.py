@@ -2,6 +2,7 @@ import os
 import base64
 import json
 import requests
+import hashlib
 
 MIDTRANS_SERVER_KEY = os.getenv("MIDTRANS_SERVER_KEY", "")
 MIDTRANS_CLIENT_KEY = os.getenv("MIDTRANS_CLIENT_KEY", "")
@@ -50,3 +51,18 @@ def get_transaction_status(order_id: str):
     }
     res = requests.get(url, headers=headers, timeout=30)
     return res.status_code, res.json()
+
+def verify_notification_signature(body: dict) -> bool:
+    """
+    Verifikasi signature dari notifikasi Midtrans.
+    Harus dipanggil di payment_webhook_routes.py sebelum proses apapun.
+    """
+    order_id        = body.get("order_id", "")
+    status_code     = body.get("status_code", "")
+    gross_amount    = body.get("gross_amount", "")
+    incoming_sig    = body.get("signature_key", "")
+
+    raw = f"{order_id}{status_code}{gross_amount}{MIDTRANS_SERVER_KEY}"
+    expected = hashlib.sha512(raw.encode()).hexdigest()
+
+    return expected == incoming_sig

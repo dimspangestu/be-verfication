@@ -8,6 +8,7 @@ from db import get_db
 from models_vendor_project import Project
 from models_admin_funding import ProjectFunding, PaymentTransaction
 from wallet_service import post_ledger_and_wallet
+from midtrans_service import verify_notification_signature
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -26,6 +27,10 @@ async def midtrans_notification(
     db: Session = Depends(get_db),
 ):
     body = await request.json()
+
+    # ✅ Verifikasi signature Midtrans
+    if not verify_notification_signature(body):
+        raise HTTPException(status_code=403, detail="Invalid signature")
 
     order_id = body.get("order_id")
     transaction_status = body.get("transaction_status")
