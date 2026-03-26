@@ -31,7 +31,6 @@ class Vendor(Base):
     id = Column(UNIQUEIDENTIFIER, primary_key=True, default=uuid.uuid4)
     user_id = Column(UNIQUEIDENTIFIER, nullable=True, index=True)
 
-    # Penting: jangan None, karena unique + SQL Server akan bentrok kalau banyak NULL
     vendor_code = Column(
         String(40),
         unique=True,
@@ -52,6 +51,7 @@ class Vendor(Base):
     address = Column(String(400), nullable=True)
 
     kyc_status = Column(String(20), nullable=False, default="unverified")
+    # unverified | pending | verified | rejected
     kyc_note = Column(String(400), nullable=True)
 
     bank_name = Column(String(80), nullable=True)
@@ -70,6 +70,35 @@ class Vendor(Base):
     updated_at = Column(DateTime, nullable=False, default=utcnow, onupdate=utcnow)
 
     projects = relationship("Project", back_populates="vendor")
+    kyc_documents = relationship(
+        "VendorKycDocument",
+        back_populates="vendor",
+        cascade="all, delete-orphan",
+    )
+
+
+class VendorKycDocument(Base):
+    __tablename__ = "vendor_kyc_documents"
+
+    id = Column(UNIQUEIDENTIFIER, primary_key=True, default=uuid.uuid4)
+    vendor_id = Column(
+        UNIQUEIDENTIFIER,
+        ForeignKey("vendors.id"),
+        nullable=False,
+        index=True,
+    )
+
+    doc_type = Column(String(30), nullable=False)
+    # buku_tabungan | npwp | akta_perusahaan | izin_usaha
+
+    file_name = Column(String(260), nullable=False)
+    mime = Column(String(120), nullable=True)
+    file_size = Column(BigInteger, nullable=True)
+    storage_path = Column(String(400), nullable=True)
+
+    created_at = Column(DateTime, nullable=False, default=utcnow)
+
+    vendor = relationship("Vendor", back_populates="kyc_documents")
 
 
 class Project(Base):
@@ -133,10 +162,10 @@ class ProjectDocument(Base):
     )
 
     doc_type = Column(String(20), nullable=False)  # proposal|rab|lainnya
-    file_name = Column(String(260), nullable=False)  # original file name
+    file_name = Column(String(260), nullable=False)
     mime = Column(String(120), nullable=True)
     file_size = Column(BigInteger, nullable=True)
-    storage_path = Column(String(400), nullable=True)  # file path di server
+    storage_path = Column(String(400), nullable=True)
 
     created_at = Column(DateTime, nullable=False, default=utcnow)
 

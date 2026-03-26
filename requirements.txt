@@ -6,3 +6,7 @@ pydantic
 xhtml2pdf
 reportlab
 pyodbc
+pymssql
+jose
+pydantic[email]
+passlib
